@@ -31,6 +31,7 @@ from app.models import (
     BriefOut,
     CopyBundle,
     DraftOut,
+    GrokCopyRequest,
     HealthOut,
     TelegramUpdate,
 )
@@ -153,7 +154,20 @@ def create_app(
 
     @app.post("/briefs", response_model=BriefOut)
     async def create_brief(body: BriefIn, pipe: Pipeline = Depends(get_pipeline)) -> BriefOut:
-        row = await pipe.create_from_brief(body.brief, body.telegram_chat_id)
+        row = await pipe.create_from_brief(
+            body.brief,
+            body.telegram_chat_id,
+            copy_request=GrokCopyRequest(
+                brief=body.brief,
+                mode="generate",
+                job=body.job,
+                department=body.department,
+                moniker=body.moniker,
+                accent=body.accent,
+                scene_seed=body.scene_seed,
+                platform=body.platform,
+            ),
+        )
         copy = parse_copy(row["current_copy_json"])
         if copy is None:
             raise HTTPException(500, "copy generation produced no bundle")

@@ -26,7 +26,7 @@ from app.models import (
     VeniceImageRequest,
     VeniceImageResult,
 )
-from app.prompts import build_messages, fake_copy
+from app.prompts import build_messages, bundle_from_b2b_content, fake_copy
 
 log = logging.getLogger(__name__)
 
@@ -101,6 +101,8 @@ class LiveGrokClient:
             response.raise_for_status()
             data = response.json()
         content = data["choices"][0]["message"]["content"]
+        if request.job == "b2b":
+            return bundle_from_b2b_content(content, request)
         return _parse_grok_content(content)
 
 
