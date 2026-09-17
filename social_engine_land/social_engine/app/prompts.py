@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 import json
+from typing import Optional
 
-from app.models import CTA_LINE, CopyBundle, GrokChatMessage, GrokCopyRequest
+from app.models import (
+    B2B_CTA_LINE,
+    B2B_CTA_URL,
+    CTA_LINE,
+    CopyBundle,
+    GrokChatMessage,
+    GrokCopyRequest,
+)
 
 SYSTEM_PROMPT = """You write PROOF: Fog & Friction Forensics social copy.
 
@@ -76,7 +84,69 @@ visual_prompt describes one cinematic still that could be a poster frame from a 
 """
 
 
+B2B_SYSTEM_PROMPT = """You write one social post. It shows a single scene from inside one department of
+a business where a tool worked and made new manual work appear somewhere else.
+
+You are not explaining anything. You are showing one thing that happened.
+
+STRUCTURE. Exactly five beats, in order.
+
+1. SETUP. One or two sentences. A real benefit that actually landed. State it
+ plainly and without irony. The tool worked. Do not undercut it.
+
+2. TURN. Exactly one sentence, in parentheses. The mundane work that appeared
+ instead. This is the hinge of the whole post. Nothing else in the post is in
+ parentheses.
+
+3. SCENE. Two to four sentences. What a specific person now does, by role. Be
+ concrete about the action. Name the role, never a person and never a company.
+
+4. WITHHOLD. Nothing. This beat is defined by absence. Do not explain why this
+ is happening. Do not name a cause, a category, a framework, a diagnosis or a
+ remedy. Do not tell the reader what it means. Stop.
+
+5. HANDOFF. The exact fixed line, unchanged, on its own:
+ There's a name for what's happening here.
+
+HARD RULES.
+
+- Use contractions. Expanded forms are a failure.
+- No em dashes and no en dashes. Ever.
+- No numbers of any kind unless supplied in the brief. Invent nothing numeric:
+ no percentages, multiples, hours, dollars, counts or durations.
+- No blame. No villain. No company or person is at fault. The people in the
+ scene are competent and the tools are working as sold.
+- Never name: Digital Fog, digital friction, infrastructure, operational
+ architecture, TransformBy10X, TBTX, BizBuilders, BBAI, BizBot Mrktng, BBM,
+ PROOF, FLOW Agent AS, Quad Keystones, Mr. Nobody, or any product.
+- Never use: supercharge, unlock, 10x, game-changing, revolutionary, seamless,
+ leverage, optimize, streamline, transform, empower, drive efficiency,
+ operational alignment, governance layer, digital transformation, synergy.
+- No question to the reader. No offer. No invitation. No hashtags.
+- No therapy language and no reassurance. Show the scene and leave.
+- Read it aloud in your head. If it sounds written, rewrite it.
+
+SELF-CHECK. Before returning, verify every line. Return nothing until all pass.
+
+ [ ] Exactly one parenthetical, and it is beat 2.
+ [ ] Beat 1 states a real benefit without irony.
+ [ ] No sentence anywhere explains why this is happening.
+ [ ] No product, brand or framework appears.
+ [ ] No number appears that was not in the brief.
+ [ ] Contractions used. No em or en dashes.
+ [ ] Ends on the fixed handoff line, exactly.
+ [ ] A reader finishes it with recognition and no explanation.
+
+If any check fails, rewrite. Do not return a post with a note about the failure.
+"""
+
+B2B_LINKEDIN_WORD_CAP = 90
+B2B_X_WORD_CAP = 45
+
+
 def build_messages(request: GrokCopyRequest) -> list[GrokChatMessage]:
+    if request.job == "b2b":
+        return _build_b2b_messages(request)
     messages = [GrokChatMessage(role="system", content=SYSTEM_PROMPT)]
     if request.mode == "revise":
         rejected = request.rejected_copy.model_dump() if request.rejected_copy else {}
@@ -103,6 +173,8 @@ def build_messages(request: GrokCopyRequest) -> list[GrokChatMessage]:
 
 def fake_copy(request: GrokCopyRequest) -> CopyBundle:
     """Deterministic on-brand PROOF package used when SOCIAL_ENGINE_FAKE=1."""
+    if request.job == "b2b":
+        return fake_b2b_copy(request)
     brief = request.brief.strip() or "the extra job the tools assigned to you"
     revised = request.mode == "revise"
     prefix = "After your note: " if revised else ""
@@ -180,3 +252,176 @@ def fake_copy(request: GrokCopyRequest) -> CopyBundle:
         visual_prompt=visual,
         flagship=True,
     )
+
+
+def b2b_visual_prompt(request: GrokCopyRequest) -> str:
+    """Venice should receive accent and scene seed, never the finished copy."""
+    accent = (request.accent or "").strip()
+    seed = (request.scene_seed or request.brief or "").strip()
+    parts: list[str] = []
+    if accent:
+        parts.append(f"Department accent: {accent}.")
+    if seed:
+        parts.append(f"Scene seed: {seed}.")
+    parts.append(
+        "Department badge upper left, campaign lockup lower left, diagnosis in columns "
+        "1-4, person and evidence in columns 5-12, department accent at 12 to 18 percent "
+        "of frame, fracture line never crossing a face, person occupying a third to half "
+        "the frame. The picture shows the person and the carry. It does not illustrate "
+        "the sentences."
+    )
+    return " ".join(parts)
+
+
+def _b2b_platform_shape(platform: str) -> str:
+    if platform == "x":
+        return (
+            f"Platform: x. Length cap: {B2B_X_WORD_CAP} words. Beats 1, 2 and 5 only. "
+            "Drop the scene beat; the parenthetical carries it. "
+            "Do not compress by removing the withhold. The withhold is not content and costs no words."
+        )
+    return (
+        f"Platform: linkedin. Length cap: {B2B_LINKEDIN_WORD_CAP} words across all five beats. Full structure. "
+        "Do not compress by removing the withhold. The withhold is not content and costs no words."
+    )
+
+
+def _b2b_brief_block(request: GrokCopyRequest) -> str:
+    seed = (request.scene_seed or request.brief or "").strip()
+    return (
+        f"department: {request.department or ''}\n"
+        f"moniker: {request.moniker or ''}\n"
+        f"accent: {request.accent or ''}\n"
+        f"scene_seed: {seed}\n"
+        f"platform: {request.platform or 'linkedin'}\n\n"
+        f"CTA_LINE = {B2B_CTA_LINE}\n"
+        f"CTA_URL = {B2B_CTA_URL}"
+    )
+
+
+def _b2b_json_instruction() -> str:
+    return (
+        "Return ONLY JSON with keys:\n"
+        '{"post": string, "visual_prompt": string}\n\n'
+        "visual_prompt uses the department accent and the scene seed, never the finished copy. "
+        "The picture shows the person and the carry. It does not illustrate the sentences. "
+        "Department badge upper left, campaign lockup lower left, diagnosis in columns 1-4, "
+        "person and evidence in columns 5-12, department accent at 12 to 18 percent of frame, "
+        "fracture line never crossing a face, person occupying a third to half the frame."
+    )
+
+
+def _build_b2b_messages(request: GrokCopyRequest) -> list[GrokChatMessage]:
+    messages = [GrokChatMessage(role="system", content=B2B_SYSTEM_PROMPT)]
+    shape = _b2b_platform_shape(request.platform or "linkedin")
+    brief_block = _b2b_brief_block(request)
+    if request.mode == "revise":
+        rejected = request.rejected_copy.public_text() if request.rejected_copy else ""
+        user = (
+            "Revise this draft. Use ONLY the original brief, the rejected post, "
+            "and the latest feedback. Do not add new offers, prices, metrics, or brands.\n\n"
+            f"{shape}\n\n"
+            f"ORIGINAL BRIEF:\n{brief_block}\n\n"
+            f"REJECTED post:\n{rejected}\n\n"
+            f"LATEST feedback_text:\n{request.feedback_text or ''}\n\n"
+            f"{_b2b_json_instruction()}"
+        )
+        messages.append(GrokChatMessage(role="user", content=user))
+        return messages
+
+    user = (
+        "Write one social post from this brief. Honor the system structure and hard rules.\n\n"
+        f"{shape}\n\n"
+        f"{brief_block}\n\n"
+        f"{_b2b_json_instruction()}"
+    )
+    messages.append(GrokChatMessage(role="user", content=user))
+    return messages
+
+
+def make_b2b_bundle(
+    post: str,
+    request: GrokCopyRequest,
+    visual_prompt: Optional[str] = None,
+) -> CopyBundle:
+    visual = (visual_prompt or "").strip() or b2b_visual_prompt(request)
+    linkedin = ""
+    x: list[str] = []
+    if request.platform == "x":
+        x = [post]
+    else:
+        linkedin = post
+    return CopyBundle(
+        job="b2b",
+        linkedin=linkedin,
+        reddit="",
+        instagram="",
+        facebook="",
+        x=x,
+        youtube_tiktok_script=None,
+        quote_line=B2B_CTA_LINE,
+        video_first=True,
+        visual_prompt=visual,
+        flagship=False,
+        department=request.department,
+        moniker=request.moniker,
+        accent=request.accent,
+        scene_seed=request.scene_seed or request.brief,
+        platform=request.platform,
+    )
+
+
+def bundle_from_b2b_content(content: str, request: GrokCopyRequest) -> CopyBundle:
+    text = (content or "").strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text.startswith("json"):
+            text = text[4:]
+        text = text.strip()
+    post = text
+    visual = None
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        data = None
+    if isinstance(data, dict):
+        if isinstance(data.get("copy"), dict):
+            data = data["copy"]
+        visual = data.get("visual_prompt")
+        post = data.get("post") or ""
+        if not post:
+            if request.platform == "x":
+                xval = data.get("x")
+                if isinstance(xval, list):
+                    post = "\n\n".join(str(item) for item in xval if str(item).strip())
+                else:
+                    post = str(xval or "")
+            else:
+                post = str(data.get("linkedin") or data.get("text") or "")
+    return make_b2b_bundle(str(post).strip(), request, visual if isinstance(visual, str) else None)
+
+
+def fake_b2b_copy(request: GrokCopyRequest) -> CopyBundle:
+    """Deterministic recognition-tier post for SOCIAL_ENGINE_FAKE=1."""
+    seed = (request.scene_seed or request.brief or "").strip()
+    if "," in seed:
+        benefit, carry = [part.strip().rstrip(".") for part in seed.split(",", 1)]
+    elif seed:
+        benefit, carry = seed.rstrip("."), "the leftover work still lands on someone"
+    else:
+        benefit, carry = "The tool did what it was supposed to do", "the leftover work still lands on someone"
+
+    beat1 = benefit[0].upper() + benefit[1:] if benefit else "The tool worked"
+    if not beat1.endswith("."):
+        beat1 = f"{beat1}."
+    beat2 = f"({carry[0].upper() + carry[1:]}.)" if carry else "(The leftover work still lands on someone.)"
+    beat3 = (
+        "A person in this department now does the leftover work by hand. "
+        "They check it, match it, and send it on. "
+        "That's the job now, and it isn't in the title."
+    )
+    if request.platform == "x":
+        post = f"{beat1}\n\n{beat2}\n\n{B2B_CTA_LINE}"
+    else:
+        post = f"{beat1}\n\n{beat2}\n\n{beat3}\n\n{B2B_CTA_LINE}"
+    return make_b2b_bundle(post, request)

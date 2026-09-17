@@ -14,9 +14,11 @@ from app.clients import (
     TelegramClient,
     VeniceClient,
 )
+from app.b2b_review import B2B_REJECT_CONDITIONS, mechanical_b2b_flags
 from app.config import Settings
 from app.db import Database, parse_copy
 from app.models import (
+    B2B_CTA_URL,
     CTA_LINE,
     CopyBundle,
     GrokCopyRequest,
@@ -105,10 +107,16 @@ class Pipeline:
         self.telegram = telegram
         self.fetch_image = fetch_image or http_fetch_image
 
-    async def create_from_brief(self, brief: str, telegram_chat_id: Optional[str] = None) -> dict[str, Any]:
+    async def create_from_brief(
+        self,
+        brief: str,
+        telegram_chat_id: Optional[str] = None,
+        copy_request: Optional[GrokCopyRequest] = None,
+    ) -> dict[str, Any]:
+        request = copy_request or GrokCopyRequest(brief=brief, mode="generate")
         draft_id = uuid4().hex
-        self.db.create_draft(draft_id, brief, telegram_chat_id=telegram_chat_id, video_first=1)
-        copy = await self.grok.generate_copy(GrokCopyRequest(brief=brief, mode="generate"))
+        self.db.create_draft(draft_id, request.brief, telegram_chat_id=telegram_chat_id, video_first=1)
+        copy = await self.grok.generate_copy(request)
         row = self.db.save_copy(draft_id, copy, status="awaiting_approval")
         self.db.insert_revision(uuid4().hex, draft_id, row["version"], copy, feedback_text=None)
         if telegram_chat_id:
@@ -127,6 +135,12 @@ class Pipeline:
                 mode="revise",
                 rejected_copy=current,
                 feedback_text=feedback_text,
+                job=current.job if current else "proof",
+                department=current.department if current else None,
+                moniker=current.moniker if current else None,
+                accent=current.accent if current else None,
+                scene_seed=current.scene_seed if current else None,
+                platform=current.platform if current else None,
             )
         )
         updated = self.db.save_copy(draft_id, copy, status="awaiting_approval", bump_version=True)
@@ -168,14 +182,21 @@ class Pipeline:
             "Cinematic still as a poster frame from motion. TBTX brand. "
             "Editorial photoreal, human tension, not clipart."
         )
-        for platform, (width, height) in PLATFORM_SIZES.items():
+        sizes = PLATFORM_SIZES
+        if copy.job == "b2b" and copy.platform in PLATFORM_SIZES:
+            sizes = {copy.platform: PLATFORM_SIZES[copy.platform]}
+        for platform, (width, height) in sizes.items():
             if platform in existing and existing[platform].get("image_url"):
                 continue
-            request = VeniceImageRequest(
-                prompt=(
+            if copy.job == "b2b":
+                prompt = f"{prompt_base} Platform crop {platform} {width}x{height}."
+            else:
+                prompt = (
                     f"{prompt_base} Platform crop {platform} {width}x{height}. "
                     "Motion-first poster frame, TBTX campaign, not a template."
-                ),
+                )
+            request = VeniceImageRequest(
+                prompt=prompt,
                 platform=platform,
                 width=width,
                 height=height,
@@ -244,7 +265,12 @@ class Pipeline:
 
         items: list[PostizPostItem] = []
         used = set()
+        allowed_platforms = None
+        if copy.job == "b2b" and copy.platform:
+            allowed_platforms = {copy.platform}
         for platform, asset in media_by_platform.items():
+            if allowed_platforms is not None and platform not in allowed_platforms:
+                continue
             integ_key = PLATFORM_TO_INTEGRATION.get(platform)
             if not integ_key or integ_key in used:
                 continue
@@ -255,15 +281,18 @@ class Pipeline:
             media_id = asset.get("postiz_media_id")
             path = asset.get("postiz_path") or asset["image_url"]
             images = [PostizMediaRef(id=str(media_id), path=path)] if media_id else []
+            settings = dict(POSTIZ_SETTINGS.get(integ_key, {"__type": integ_key}))
+            if copy.job == "b2b":
+                settings["url"] = B2B_CTA_URL
             items.append(
                 PostizPostItem(
                     integration=PostizIntegrationRef(id=integ_id),
                     value=[PostizPostValue(content=copy.copy_for(platform), image=images)],
-                    settings=POSTIZ_SETTINGS.get(integ_key, {"__type": integ_key}),
+                    settings=settings,
                 )
             )
 
-        if "reddit" in integrations and "reddit" not in used:
+        if copy.job != "b2b" and "reddit" in integrations and "reddit" not in used:
             items.append(
                 PostizPostItem(
                     integration=PostizIntegrationRef(id=integrations["reddit"]),
@@ -290,13 +319,33 @@ class Pipeline:
     async def _notify_telegram(
         self, draft_id: str, chat_id: str, copy: CopyBundle, version: int
     ) -> None:
-        preview = (
-            f"Draft {draft_id[:8]} v{version} is waiting.\n\n"
-            f"Quote: {copy.quote_line or copy.x[0]}\n\n"
-            f"LinkedIn (trim):\n{copy.linkedin[:400]}\n\n"
-            f"{CTA_LINE}\n\n"
-            "APPROVE or REJECT with a note."
-        )
+        if copy.job == "b2b":
+            flags = mechanical_b2b_flags(
+                copy.public_text(),
+                " ".join(part for part in (copy.scene_seed, copy.moniker, copy.accent) if part),
+            )
+            flags_line = (
+                "Mechanical flags: " + " ".join(flags)
+                if flags
+                else "Mechanical flags: none. Items 1, 2, and 9 need a human read."
+            )
+            preview = (
+                f"Draft {draft_id[:8]} v{version} is waiting. B2B recognition post ({copy.platform}).\n\n"
+                f"{copy.public_text()}\n\n"
+                f"{B2B_CTA_URL}\n\n"
+                "Human approve step. Reject and regenerate if any of these hold:\n"
+                + "\n".join(B2B_REJECT_CONDITIONS)
+                + f"\n\n{flags_line}\n\n"
+                "APPROVE or REJECT with a note."
+            )
+        else:
+            preview = (
+                f"Draft {draft_id[:8]} v{version} is waiting.\n\n"
+                f"Quote: {copy.quote_line or copy.x[0]}\n\n"
+                f"LinkedIn (trim):\n{copy.linkedin[:400]}\n\n"
+                f"{CTA_LINE}\n\n"
+                "APPROVE or REJECT with a note."
+            )
         markup = {
             "inline_keyboard": [
                 [

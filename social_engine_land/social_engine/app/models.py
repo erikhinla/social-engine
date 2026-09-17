@@ -12,6 +12,14 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 CTA_LINE = "Map Business Momentum → https://transformby10x.ai/proof"
 CTA_URL = "https://transformby10x.ai/proof"
 
+# Recognition-tier B2B job. Do not replace the PROOF constants above.
+B2B_CTA_LINE = "There's a name for what's happening here."
+B2B_CTA_URL = "https://transformby10x.ai/bbai"
+
+JobType = Literal["proof", "b2b"]
+B2BDepartment = Literal["ACC", "FIN", "LGL", "PRD", "STR", "CRT", "PR", "MED", "HR", "OPS"]
+B2BPlatform = Literal["linkedin", "x"]
+
 DraftStatus = Literal[
     "pending_copy",
     "awaiting_approval",
@@ -79,6 +87,12 @@ class CopyBundle(BaseModel):
     visual_prompt: Optional[str] = None
     flagship: bool = False
     postiz_post_ids: list[str] = Field(default_factory=list)
+    job: JobType = "proof"
+    department: Optional[B2BDepartment] = None
+    moniker: Optional[str] = None
+    accent: Optional[str] = None
+    scene_seed: Optional[str] = None
+    platform: Optional[B2BPlatform] = None
 
     @field_validator("x", mode="before")
     @classmethod
@@ -96,6 +110,8 @@ class CopyBundle(BaseModel):
 
     @model_validator(mode="after")
     def lock_public_copy(self) -> "CopyBundle":
+        if self.job == "b2b":
+            return self._lock_b2b_copy()
         self.linkedin = ensure_cta(strip_dash_punctuation(self.linkedin))
         self.reddit = strip_dash_punctuation(self.reddit)
         if CTA_URL not in self.reddit and "start here" not in self.reddit.lower():
@@ -108,6 +124,28 @@ class CopyBundle(BaseModel):
             self.x.append(CTA_LINE)
         if self.youtube_tiktok_script:
             self.youtube_tiktok_script = ensure_cta(strip_dash_punctuation(self.youtube_tiktok_script))
+        if self.quote_line:
+            self.quote_line = strip_dash_punctuation(self.quote_line)
+        return self
+
+    def _lock_b2b_copy(self) -> "CopyBundle":
+        """Recognition-tier lock: exact handoff line, never the PROOF CTA."""
+
+        def finish(text: str) -> str:
+            if not (text or "").strip():
+                return text or ""
+            body = strip_dash_punctuation(text).rstrip()
+            if B2B_CTA_LINE not in body:
+                body = f"{body}\n\n{B2B_CTA_LINE}"
+            return body
+
+        self.linkedin = finish(self.linkedin)
+        self.reddit = strip_dash_punctuation(self.reddit or "")
+        self.instagram = strip_dash_punctuation(self.instagram or "")
+        self.facebook = strip_dash_punctuation(self.facebook or "")
+        self.x = [finish(t) for t in self.x]
+        if self.youtube_tiktok_script:
+            self.youtube_tiktok_script = strip_dash_punctuation(self.youtube_tiktok_script)
         if self.quote_line:
             self.quote_line = strip_dash_punctuation(self.quote_line)
         return self
@@ -132,12 +170,36 @@ class CopyBundle(BaseModel):
             return self.linkedin
         return self.linkedin
 
+    def public_text(self) -> str:
+        if self.job == "b2b" and self.platform == "x":
+            return self.x_text()
+        return self.linkedin
+
 
 class GrokCopyRequest(BaseModel):
     brief: str
     mode: Literal["generate", "revise"] = "generate"
     rejected_copy: Optional[CopyBundle] = None
     feedback_text: Optional[str] = None
+    job: JobType = "proof"
+    department: Optional[B2BDepartment] = None
+    moniker: Optional[str] = None
+    accent: Optional[str] = None
+    scene_seed: Optional[str] = None
+    platform: Optional[B2BPlatform] = None
+
+    @model_validator(mode="after")
+    def require_b2b_brief_fields(self) -> "GrokCopyRequest":
+        if self.job != "b2b":
+            return self
+        seed = (self.scene_seed or "").strip() or self.brief.strip()
+        if not self.department or not self.platform or not seed:
+            raise ValueError("b2b job requires department, platform, and scene_seed")
+        if not (self.scene_seed or "").strip():
+            self.scene_seed = seed
+        if not self.brief.strip():
+            self.brief = seed
+        return self
 
 
 class GrokChatMessage(BaseModel):
@@ -310,8 +372,31 @@ class TelegramSendMessageResponse(BaseModel):
 
 
 class BriefIn(BaseModel):
-    brief: str
+    brief: str = ""
     telegram_chat_id: Optional[str] = None
+    job: JobType = "proof"
+    department: Optional[B2BDepartment] = None
+    moniker: Optional[str] = None
+    accent: Optional[str] = None
+    scene_seed: Optional[str] = None
+    platform: Optional[B2BPlatform] = None
+
+    @model_validator(mode="after")
+    def require_b2b_fields(self) -> "BriefIn":
+        if self.job != "b2b":
+            return self
+        missing: list[str] = []
+        if not self.department:
+            missing.append("department")
+        if not (self.scene_seed or "").strip():
+            missing.append("scene_seed")
+        if not self.platform:
+            missing.append("platform")
+        if missing:
+            raise ValueError("b2b job requires " + ", ".join(missing))
+        if not self.brief.strip():
+            self.brief = self.scene_seed.strip()
+        return self
 
 
 class BriefOut(BaseModel):
