@@ -1,0 +1,172 @@
+{
+ "erik": {
+  "x": {
+   "handle": "@ErikHBush",
+   "fields": {
+    "Name": [
+     "Erik H Bush",
+     50
+    ],
+    "Bio": [
+     "Twenty years running agency operations. Now I build the infrastructure AI-speed work needs. Your team adopted AI. Your infrastructure didn't.",
+     160
+    ],
+    "Location": [
+     "New York",
+     30
+    ],
+    "Website": [
+     "erikhbush.com",
+     100
+    ]
+   },
+   "banner": "x"
+  },
+  "linkedin": {
+   "handle": "Erik Howerbush",
+   "fields": {
+    "Headline": [
+     "Your team adopted AI. Your infrastructure didn't. Founder, TransformBy10X. 20 years running agency operations on Madison Avenue.",
+     220
+    ],
+    "About": [
+     "I spent twenty years running agency operations on Madison Avenue: briefs, feedback, approvals, delivery, and every handoff in between. Context always mattered, but work moved at human speed, so people could carry it.\n\nAI changed the speed. Drafts went from three to thirty. Versions went from a week apart to an afternoon apart. The handoffs didn't change, so the context started dropping in the gap.\n\nThat's the problem I work on now. Your team adopted AI. Your infrastructure didn't. AI makes more work possible than traditional BizOps can carry.\n\nAt TransformBy10X I build the structure that carries it: the folders, the decision record, the rule for how a change travels, and the files every person and every AI reads first.\n\nPROOF shows where your work stalls in 15 answers, at no charge: transformby10x.ai/proof\nBACK builds the structure from those answers.\n\nI also write Prompting Circumstance, real exchanges with AI with the typos left in, at erikhbush.com.\n\nInfrastructure before intelligence.",
+     2600
+    ],
+    "Website": [
+     "erikhbush.com",
+     256
+    ]
+   },
+   "banner": "li"
+  },
+  "instagram": {
+   "handle": "Erik H Bush",
+   "fields": {
+    "Name": [
+     "Erik H Bush",
+     30
+    ],
+    "Bio": [
+     "Agency operations, 20 years. Building the infrastructure AI-speed work needs.\nInfrastructure before intelligence.\nWhere your work stalls:",
+     150
+    ],
+    "Link": [
+     "transformby10x.ai/proof?s=bio-ig",
+     100
+    ]
+   },
+   "banner": null
+  },
+  "youtube": {
+   "handle": "Erik H Bush",
+   "fields": {
+    "Description": [
+     "Your team adopted AI. Your infrastructure didn't.\n\nI ran agency operations for twenty years. Now I build the infrastructure that keeps context with the work when it moves at AI speed. Short scenes from inside the handoff, walk-throughs of the decks behind TransformBy10X, and the occasional real exchange with AI.\n\nSee where your work stalls in 15 answers: https://transformby10x.ai/proof?s=bio-yt\nMore: https://erikhbush.com",
+     1000
+    ],
+    "Links": [
+     "PROOF: https://transformby10x.ai/proof?s=bio-yt | erikhbush.com",
+     300
+    ]
+   },
+   "banner": "yt"
+  },
+  "reddit": {
+   "handle": "OPEN: Erik's Reddit username",
+   "fields": {
+    "Display name": [
+     "Erik H Bush",
+     30
+    ],
+    "About": [
+     "Twenty years in agency operations. I write about what happens to briefs, approvals and handoffs when work moves at AI speed. erikhbush.com",
+     200
+    ]
+   },
+   "banner": "rd"
+  }
+ },
+ "tbtx": {
+  "x": {
+   "handle": "@transformby10x",
+   "fields": {
+    "Name": [
+     "TransformBy10X",
+     50
+    ],
+    "Bio": [
+     "Your team adopted AI. Your infrastructure didn't. PROOF shows where your work stalls in 15 answers. BACK builds the fix. Infrastructure before intelligence.",
+     160
+    ],
+    "Website": [
+     "transformby10x.ai/proof?s=bio-x",
+     100
+    ]
+   },
+   "banner": "x"
+  },
+  "linkedin-page": {
+   "handle": "TransformBy10X",
+   "fields": {
+    "Tagline": [
+     "Infrastructure before intelligence. Your team adopted AI. Your infrastructure didn't.",
+     120
+    ],
+    "Overview": [
+     "Your team adopted AI. Your infrastructure didn't.\n\nAI makes more work possible than traditional BizOps can carry. Output moves at AI speed. Briefs, feedback, approvals and decisions still move at handoff speed, and the context drops in the gap. Versions multiply. Legal lines stop traveling. The brief gets re-explained every Sunday.\n\nTransformBy10X builds the infrastructure that carries the work.\n\nPROOF: 15 answers that show where your work stalls and what it costs. No charge, no email.\nBACK: the folders, Keystone files and handoff rules, written from your own answers. Your team puts them in place.\n\nFounded by Erik H Bush after twenty years running agency operations.\n\nInfrastructure before intelligence.",
+     2000
+    ],
+    "Website": [
+     "https://transformby10x.ai",
+     256
+    ]
+   },
+   "banner": "lip"
+  },
+  "facebook": {
+   "handle": "TransformBy10X",
+   "fields": {
+    "Intro": [
+     "Your team adopted AI. Your infrastructure didn't. See where your work stalls in 15 answers.",
+     101
+    ],
+    "Website": [
+     "https://transformby10x.ai/proof?s=bio-fb",
+     256
+    ]
+   },
+   "banner": "fb"
+  },
+  "instagram": {
+   "handle": "OPEN: no TransformBy10X Instagram is connected",
+   "fields": {
+    "Bio": [
+     "Your team adopted AI. Your infrastructure didn't.\nPROOF: see where your work stalls in 15 answers.\nInfrastructure before intelligence.",
+     150
+    ]
+   },
+   "banner": null
+  },
+  "youtube": {
+   "handle": "OPEN: no TransformBy10X YouTube is connected",
+   "fields": {
+    "Description": [
+     "Your team adopted AI. Your infrastructure didn't. TransformBy10X builds the infrastructure that keeps context with the work at AI speed. See where your work stalls in 15 answers: https://transformby10x.ai/proof?s=bio-yt",
+     1000
+    ]
+   },
+   "banner": "yt"
+  },
+  "reddit": {
+   "handle": "OPEN: no TransformBy10X Reddit account known",
+   "fields": {
+    "About": [
+     "Infrastructure before intelligence. Your team adopted AI. Your infrastructure didn't. transformby10x.ai",
+     200
+    ]
+   },
+   "banner": null
+  }
+ }
+}
