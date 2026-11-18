@@ -8,7 +8,7 @@ pillar: thesis
 hook: H-06
 test: T2:carousel
 asset: render:W1-09
-status: draft
+status: scheduled
 ---
 Your team adopted AI. Your infrastructure didn't.
 

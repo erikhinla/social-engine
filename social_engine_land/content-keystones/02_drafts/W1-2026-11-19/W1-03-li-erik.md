@@ -9,7 +9,7 @@ hook: H-08
 test: T3:job-posting
 reply: I built a 15-answer check that shows where this job is landing on your team: https://transformby10x.ai/proof?s=W1-03
 asset: render:W1-02
-status: draft
+status: scheduled
 ---
 AI created a job. Nobody applied.
 

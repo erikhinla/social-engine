@@ -1,0 +1,14 @@
+id,channel,scheduled_utc,postiz_post_id,link_tag,status
+W1-01,x-erik,2026-11-19T13:30Z,cmwlg28pd003gs3740plxsvff,s=W1-01,scheduled
+W1-02,x-tbtx,2026-11-19T18:00Z,cmwlg2l4c003is374cp4x2g7e,s=W1-02,scheduled
+W1-03,li-erik,2026-11-19T14:00Z,cmwlg2l56003ks374j8safrp5,s=W1-03,scheduled
+W1-04,ig-erik,2026-11-20T17:00Z,cmwlg2l64003ms374hg8vv4sm,,scheduled
+W1-05,yt-erik,2026-11-20T17:00Z,cmwlg2l6u003ns37449b8id03,s=W1-05,scheduled
+W1-06,fb-tbtx,2026-11-20T17:30Z,cmwlg2l7g003os3748owwxv8m,s=W1-06,scheduled
+W1-07,x-tbtx,2026-11-23T18:00Z,cmwlg3166003ps374ox2lrd6e,s=W1-07,scheduled
+W1-08,x-erik,2026-11-23T13:30Z,cmwlg316k003qs3744vc8lefl,s=W1-08,scheduled
+W1-09,li-tbtx,2026-11-24T15:00Z,cmwlg317g003ss374zlngeenu,s=W1-09,scheduled
+W1-10,ig-erik,2026-11-24T17:00Z,cmwlg317z003ts3742o73lq70,,scheduled
+W1-11,li-erik,2026-11-24T14:00Z,cmwlg318v003us3743azwxekc,s=W1-11,scheduled
+W1-12,x-tbtx,2026-11-25T18:00Z,cmwlg319r003ws374rjkawjw4,s=W1-12,scheduled
+W1-13,x-erik,2026-11-25T13:30Z,cmwlg31al003ys374b2rihqe7,s=W1-13,scheduled

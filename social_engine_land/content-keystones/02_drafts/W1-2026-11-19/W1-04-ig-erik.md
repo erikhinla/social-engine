@@ -8,7 +8,7 @@ pillar: recognition
 hook: H-08
 test: T2:reel
 asset: render:W1-02, reel:W1-04
-status: draft
+status: scheduled
 ---
 AI created a job. Nobody applied.
 

@@ -15,7 +15,7 @@ cards:
   - diptych | Tools that rewrite the copy on request. | A way for the new legal line to reach every file.
   - statement | AI makes more work possible than traditional BizOps can carry. | The gap is the handoff.
   - end | See where your work stalls. | 15 answers, no charge, no email.
-status: draft
+status: scheduled
 ---
 Your team adopted AI. Your infrastructure didn't.
 

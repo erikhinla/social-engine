@@ -7,7 +7,7 @@ time: "08:30"
 pillar: pressure
 hook: H-05
 reply: See where yours stalls: https://transformby10x.ai/proof?s=W1-13
-status: draft
+status: scheduled
 ---
 The shops that worry me aren't the big ones.
 

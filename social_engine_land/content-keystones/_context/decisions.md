@@ -10,3 +10,5 @@ date | decision | decided by | affects | status
 2026-11-17 | Never post, schedule or spend without Erik's per-piece approval | Erik | queue | standing
 2026-11-18 | What is the "Seraphina Vane" X account in Postiz, and does it get content? | OPEN: Erik | channels | open
 2026-11-18 | Higgsfield clips: cleared for commercial use? | OPEN: Erik | rights | open
+2026-11-18 | Week 1 approved in full and scheduled in Postiz (times are New York time) | Erik | W1 | done
+2026-11-18 | H-08 and H-09 approved with week 1 | Erik | hooks | done

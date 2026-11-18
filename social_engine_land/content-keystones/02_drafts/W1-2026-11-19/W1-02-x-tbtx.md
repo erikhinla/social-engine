@@ -11,7 +11,7 @@ asset: render:W1-02
 cards:
   - job | Context Carrier | Full time. Unlisted. Already on your team. | Remember which version the client approved;Carry every legal change into every file;Re-explain the brief to every new tool | Nobody applied.
 reply: See where your work stalls. 15 answers, no charge, no email. https://transformby10x.ai/proof?s=W1-02
-status: draft
+status: scheduled
 ---
 AI created a job. Nobody applied.
 

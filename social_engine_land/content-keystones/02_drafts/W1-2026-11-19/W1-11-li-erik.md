@@ -7,7 +7,7 @@ time: "09:00"
 pillar: recognition
 hook: H-02
 reply: The 15-answer check I built for exactly this: https://transformby10x.ai/proof?s=W1-11
-status: draft
+status: scheduled
 ---
 Client legal lines changed. Templates didn't.
 

@@ -8,7 +8,7 @@ pillar: recognition
 hook: H-09
 test: T1:link-in-reply
 reply: See PROOF. 15 answers, no charge, no email. https://transformby10x.ai/proof?s=W1-12
-status: draft
+status: scheduled
 ---
 Every AI tool you bought makes more versions.
 

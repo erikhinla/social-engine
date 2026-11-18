@@ -11,8 +11,8 @@ H-04 | Somebody's re-explaining the brief. Again. On a Sunday. | recognition | a
 H-05 | A three-person shop just quoted your client the same job in a third of the time. | pressure | approved
 H-06 | Your team adopted AI. Your infrastructure didn't. | thesis | approved
 H-07 | AI makes more work possible than traditional BizOps can carry. | thesis | approved
-H-08 | AI created a job. Nobody applied. | recognition | new
-H-09 | Every AI tool you bought makes more versions. None of them knows which one is approved. | recognition | new
+H-08 | AI created a job. Nobody applied. | recognition | approved
+H-09 | Every AI tool you bought makes more versions. None of them knows which one is approved. | recognition | approved
 H-10 | The round that should have closed Tuesday is still open Friday at 9 p.m. | recognition | new
 H-11 | The music license covers broadcast. The campaign is mostly social. | recognition | new
 H-12 | Is your workflow built for AI speed? | question | approved

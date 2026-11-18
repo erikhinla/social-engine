@@ -7,7 +7,7 @@ time: "12:00"
 pillar: recognition
 hook: H-08
 asset: reel:W1-04
-status: draft
+status: scheduled
 ---
 AI created a job. Nobody applied. #Shorts
 

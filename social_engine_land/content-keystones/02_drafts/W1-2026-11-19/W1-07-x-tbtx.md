@@ -8,7 +8,7 @@ pillar: recognition
 hook: H-01
 test: T1:link-in-post
 notes: Link in the post on purpose, it is the B arm of test T1.
-status: draft
+status: scheduled
 ---
 The editor's marking up v2. The client approved v3.
 

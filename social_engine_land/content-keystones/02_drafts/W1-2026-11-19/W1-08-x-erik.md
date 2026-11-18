@@ -7,7 +7,7 @@ time: "08:30"
 pillar: thesis
 hook: H-06
 reply: Where it shows up first, in 15 answers: https://transformby10x.ai/proof?s=W1-08
-status: draft
+status: scheduled
 ---
 New line on my homepage this week:
 
