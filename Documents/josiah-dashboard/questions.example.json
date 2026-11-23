@@ -1,0 +1,17 @@
+[
+  {
+    "id": "interest",
+    "question": "Why are you interested in the GUTC Leaders Fellowship?",
+    "word_limit": 300
+  },
+  {
+    "id": "goals",
+    "question": "What do you hope to learn or develop through the fellowship?",
+    "word_limit": 300
+  },
+  {
+    "id": "experience",
+    "question": "Describe your professional experience and leadership background.",
+    "word_limit": 500
+  }
+]
